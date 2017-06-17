@@ -14,26 +14,34 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 public class Generator {
 	private static final String APP_COMPONENTS = "src/com/output/";
 	private static final String TARGET_SRC_PACKAGE = "com.output";
+	
     public static void main(String[] args) throws IOException {
-	    	Template template = getTemplate();
+	    	Template template = getTemplate("template");
 	    	
 	    	TemplateModel address = new TemplateModel();
+	    	// TODO -- should not have to add Service here
 	    	address.setComponentName("PhilService");
 	    	address.setTemplatePackage(TARGET_SRC_PACKAGE);
 	    	String content = getContent(address, template);
 	    	
 	    	String filePath = APP_COMPONENTS + address.getComponentName();
+	    	
+	    	// TODO - abstract creation into separate methods
+	    	// create service
+	    	// create provider
+	    	// create controller
+	    	// create model
 	    	createFiles(filePath, "Service");
 	    	writeFiles(content, filePath);
     }
     
-    public static Template getTemplate() throws IOException {
+    public static Template getTemplate(String templateName) throws IOException {
 	    	TemplateLoader loader = new ClassPathTemplateLoader();
 	    	loader.setPrefix("");
 	    	loader.setSuffix(".html");
 	    	Handlebars handlebars = new Handlebars(loader);
 	
-	    	return handlebars.compile("template");
+	    	return handlebars.compile(templateName);
     }
     public static String getContent(TemplateModel model, Template template) throws IOException {
 	    	String content = template.apply(model);
