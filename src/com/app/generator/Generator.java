@@ -12,8 +12,8 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 
 public class Generator {
-	private static final String APP_COMPONENTS = "src/com/output/service/";
-	private static final String TARGET_SRC_PACKAGE = "com.output.service";
+	private static final String APP_COMPONENTS = "src/com/output/";
+	private static final String TARGET_SRC_PACKAGE = "com.output";
 	
 	// TODO - check if any of the files already exist
 	// TODO - abstract creation into separate methods
@@ -23,25 +23,38 @@ public class Generator {
 	// create model
     public static void main(String[] args) throws IOException {
     		// get input
-    		String componentName = "Phil";
-    		
+    		String componentName = "PhilBert";
+            
     		// create template(s)
-    		TemplateModel service = new TemplateModel();
-    		service.setTemplateName("service-template");
-    		service.setComponentName(componentName);
-    		service.setTemplatePackage(TARGET_SRC_PACKAGE);
-    		service.setFileSuffix("Service");
-    		service.setFileExt(".java");
-    		service.setFilePath(APP_COMPONENTS);
-    		createService(service);
+    		createComponent(getServiceTemplate(componentName, "Service"));
+    		//createComponent(getServiceTemplate(componentName, "Controller"));
     }
-    public static void createService(TemplateModel model) throws IOException {
+    
+    public static TemplateModel getServiceTemplate(String componentName, String suffix){
+		TemplateModel service = new TemplateModel();
+		String lowercase = componentName.toLowerCase();
+		String suffixLowerCase = suffix.toLowerCase();
+		service.setTemplateName(suffixLowerCase+"-template");
+		service.setComponentName(componentName);
+		service.setTemplatePackage(TARGET_SRC_PACKAGE + "." + lowercase +"." + suffixLowerCase);
+		service.setFilePath(APP_COMPONENTS + lowercase + "/ " + suffixLowerCase +"/");
+		service.setFileSuffix(suffix);
+		service.setFileExt(".java");
+		return service;
+    }
+    
+    public static String toHyphen(String componentName){
+		String regex = "([a-z])([A-Z]+)";
+        String replacement = "$1-$2";
+        return componentName.replaceAll(regex, replacement)
+                           .toLowerCase();
+    }
+    public static void createComponent(TemplateModel model) throws IOException {
     		// get handle bar template
 	    	Template template = getTemplate(model.getTemplateName());
 	    	
 	    	// get template content
 	    	String content = getContent(model, template);
-	    	
 	    	
 	    	createFiles(model.getFilePath(), model.getFileName());
 	    	writeFiles(content, model.getFilePath(), model.getFileName());

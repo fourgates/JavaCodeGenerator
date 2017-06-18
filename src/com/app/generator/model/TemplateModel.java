@@ -2,8 +2,9 @@ package com.app.generator.model;
 
 public class TemplateModel {
 	private String templatePackage;
-	private String componentName;
 	private String templateName;
+	
+	private String componentName;
 	private String fileSuffix;
 	private String filePath;
 	private String fileExt;
