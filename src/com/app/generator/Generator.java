@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import com.app.generator.model.TemplateModel;
 import com.github.jknack.handlebars.Handlebars;
@@ -13,7 +12,6 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 
 public class Generator {
-	private static Logger LOGGER = Logger.getLogger("Generator");
 	private static final String APP_COMPONENTS = "src/com/output/service/";
 	private static final String TARGET_SRC_PACKAGE = "com.output.service";
 	
@@ -32,20 +30,21 @@ public class Generator {
     		service.setTemplateName("service-template");
     		service.setComponentName(componentName);
     		service.setTemplatePackage(TARGET_SRC_PACKAGE);
-    		
-    		createService(service, "Service");
+    		service.setFileSuffix("Service");
+    		service.setFileExt(".java");
+    		service.setFilePath(APP_COMPONENTS);
+    		createService(service);
     }
-    public static void createService(TemplateModel model, String fileSuffix) throws IOException {
+    public static void createService(TemplateModel model) throws IOException {
     		// get handle bar template
 	    	Template template = getTemplate(model.getTemplateName());
 	    	
 	    	// get template content
 	    	String content = getContent(model, template);
 	    	
-	    	String filePath = APP_COMPONENTS;
-	    	String fileName = model.getComponentName() + fileSuffix + ".java";
-	    	createFiles(filePath, fileName);
-	    	writeFiles(content, filePath, fileName);
+	    	
+	    	createFiles(model.getFilePath(), model.getFileName());
+	    	writeFiles(content, model.getFilePath(), model.getFileName());
     }
     public static Template getTemplate(String templateName) throws IOException {
 	    	TemplateLoader loader = new ClassPathTemplateLoader();
@@ -57,13 +56,16 @@ public class Generator {
     }
     public static String getContent(TemplateModel model, Template template) throws IOException {
 	    	String content = template.apply(model);
+	    	System.out.println("Template: ");
 	    	System.out.println(content);
 	    	return content;
     }
     public static void createFiles(String filePath, String fileName) throws IOException {
-    		LOGGER.info("creating files");
-    		LOGGER.info("file path: " + filePath);
-    		LOGGER.info("file name: " +fileName);
+    		System.out.println("creating files");
+    		System.out.println("file path: " + filePath);
+    		System.out.println("file name: " +fileName);
+    		
+    		// TODO -- what to do if file or dir exists
     		new File(filePath).mkdirs();
     		new File(filePath + fileName).createNewFile();
     }
